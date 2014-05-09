@@ -4,7 +4,7 @@
 <?php include('includes/conn.php'); ?>
 <?php require_once('includes/css_js_links.php'); ?>
 <?php require_once('includes/auth.php'); ?>
-<title><?php require_once('includes/title.php'); ?></title>
+<title>Create Issue</title>
 </head>
 <body>
 <script type="text/javascript">
@@ -58,10 +58,11 @@ if(isset($_POST['Submit']))
 			$dispenser_functional=$_POST['dispenser_functional'];
 			$issuetype_id=$_POST['issuetype_id'];
 			$user_comments=$_POST['user_comments'];
+			$prototype = $_POST['disp_prototype'];
 			
 			
-			$query = "INSERT INTO issue (waterpoint_id,date_created,dispenser_functional,issuetype_id,createdby,user_comments) ".
-	"VALUES ('$waterpoint_id','$date','$dispenser_functional','$issuetype_id','$session_emp_no','$user_comments')";
+			$query = "INSERT INTO issue (waterpoint_id,date_created,dispenser_functional,issuetype_id,createdby,user_comments, prototype) ".
+	"VALUES ('$waterpoint_id','$date','$dispenser_functional','$issuetype_id','$session_emp_no','$user_comments','$prototype')";
 	mysql_query($query) or die('Error, query failed');
 	$messageToUser="Issue for $waterpoint_id. Created Succesfuly!<p>";
 	} 
@@ -143,6 +144,15 @@ if(isset($_POST['Submit']))
                 <div align="center">
 				Yes<input type="radio" name="dispenser_functional" value="Yes" />
                 No<input type="radio" name="dispenser_functional" value="No" /><?php display_error("dispenser_functional",$errors);?>
+			    </div>
+			</td>
+          </tr>
+          <tr>
+			<td><strong>Prototype:</strong></td>
+            <td>
+                <div align="center">
+				Yes<input type="radio" name="disp_prototype" value="Yes" />
+                No<input type="radio" name="disp_prototype" value="No" /><?php display_error("disp_prototype",$errors);?>
 			    </div>
 			</td>
           </tr>

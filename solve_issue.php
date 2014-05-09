@@ -9,8 +9,10 @@
 	$issueid =$_GET['issueid'];
 	if(isset($_POST['Submit'])){;
 	$user_comments = $_POST['user_comments'];
+	$investigated = $_POST['investigated'];
+	$reason_unsolved = $_POST['reason_unsolved'];
 	$solved = $_POST['solved'];
-	mysql_query("UPDATE issue SET solved ='$solved',date_solved='$date',solvedby='$session_emp_no',user_comments='$user_comments',dispenser_functional='Yes' WHERE issueid = '$issueid'")or die(mysql_error());
+	mysql_query("UPDATE issue SET solved ='$solved',date_solved='$date',solvedby='$session_emp_no',user_comments='$user_comments',dispenser_functional='Yes', issue_investigated = '$investigated', reason_unsolved = '$reason_unsolved' WHERE issueid = '$issueid'")or die(mysql_error());
 	header("Location: unsolved_issues.php?regional_office_id=$session_regional_office_id");				
 }
 ?>
@@ -80,6 +82,21 @@
             <td><strong>Disp Functional?:</strong></td>
             <td><?php echo $row["dispenser_functional"]; ?></td>
 		  </tr>
+                    
+          
+          <tr>
+            <td><strong>Investigated?:</strong></td>
+            <td>
+			<label><input type="radio" name="investigated" value="Yes" /> Yes </label>
+			<label><input type="radio" name="investigated" value="No" /> No </label>			</td>
+          </tr>
+                    
+          <tr>
+            <td valign="top"><strong>Reason Unsolved?:</strong></td>
+            <td>
+              <textarea name="reason_unsolved" id="reason_unsolved"><?php echo $row["reason_unsolved"]; ?></textarea></td>
+		  </tr>
+          
 		  <tr>
             <td valign="top"><strong>Comments:</strong></td>
             <td>

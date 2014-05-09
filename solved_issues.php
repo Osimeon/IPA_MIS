@@ -6,182 +6,123 @@
 <?php require_once('includes/css_js_links.php'); ?>
 <?php require_once('includes/auth.php'); ?>
 <?php
-$f_country_name = $_GET['country_name'];
 $f_regional_office_id = $_GET['regional_office_id'];
-$f_district_name = $_GET['district_name'];
-$f_sublocation_parish = $_GET['sublocation_parish'];
-$f_village = $_GET['village'];
-$f_waterpoint_id = $_GET['waterpoint_id'];
-$f_waterpoint_name = $_GET['waterpoint_name'];
-$f_date_solved = $_GET['date_solved'];
-$f_user_assigned = $_GET['solvedby'];
-$f_issuetype_id = $_GET['issuetype_id'];
 ?>
-<title><?php require_once('includes/title.php'); ?></title>
-<script type="text/javascript">  
-    function submitOnEnter(inputElement, event) {  
-        if (event.keyCode == 13) { // No need to do browser specific checks. It is always 13.  
-            inputElement.form.submit();  
-        }  
-    }  
-</script>
-<script type="text/javascript">
-$(document).ready(function() {
-	$("#regional_office_id").change(function() {
-		$.get('loaddistrict.php?regional_office_id=' + $(this).val(), function(data) {
-			$("#district_name").html(data);
-			$('#loader').slideUp(200, function() {
-				$(this).remove();
-			});
-		});	
-    });
-	$("#district_name").change(function() {
-		$.get('loadsublocation.php?district_name=' + $(this).val(), function(data) {
-			$("#sublocation_parish").html(data);
-			$('#loader').slideUp(200, function() {
-				$(this).remove();
-			});
-		});	
-    });
-	$("#sublocation_parish").change(function() {
-		$.get('loadvillage.php?sublocation_parish=' + $(this).val(), function(data) {
-			$("#village").html(data);
-			$('#loader').slideUp(200, function() {
-				$(this).remove();
-			});
-		});	
-    });
+<title>Solved Issues</title>
 
-});
-</script>
-<script type="text/javascript">
-function un_check(){
-for (var i = 0; i < document.frmactive.elements.length; i++) {
-var e = document.frmactive.elements[i];
-if ((e.name != 'allbox') && (e.type == 'checkbox')) {
-e.checked = document.frmactive.allbox.checked;
-}}}
-</script>
 <style type="text/css">
 <!--
 .style1 {color: #FE1407}
 -->
 </style>
+<script type="text/javascript" src="js/picnet.table.filter.min.js"></script>
+<script> 
+	$(document).ready(function() {
+		$('#tablesorter').tableFilter();
+	});
+</script>
 </head>
 <body>
     <table class="container">
-    <tr>
-      <td colspan="3">
-	  <fieldset name="reg_user" id="reg_user">
-	  <legend align="center"><h2>ISSUES SOLVED</h2></legend>
-	  <div align="center"><?php include("includes/messageBox.php");?></div>
-	  <div style="height:540px; overflow:scroll">
-	  	<table class="gridtable" align="center" width="100%">
-		<form action="" method="GET">
-		  <tr>
-			<th>No.</th>
-			<th>Regional Office</th>
-			<th>District Name</th>
-			<th>Sub location/Parish</th>
-			<th>Village Name</th>
-			<th>Waterpoint Name</th>
-			<th>Waterpoint ID</th>
-			<th>Date Solved</th>
-			<th>Solved By</th>
-			<th>Issue Type</th>
-			<th>D.F?</th>
-			<th>Solved</th>
-			<th></th>
-		  </tr>
-		<tr>
-			<td></td>
-			<td><select name="regional_office_id" id="regional_office_id" onkeypress="submitOnEnter(this, event);"><option value="">Select Region</option>
-			<?php		 
-			$query_office = mysql_query("SELECT * FROM regional_office,program WHERE regional_office.regional_office_id=program.regional_office_id AND program.country_name='$session_country_name' GROUP BY program.regional_office_id ORDER BY office_name") or die("Query failed: ".mysql_error());
-			while($office = mysql_fetch_array($query_office)): ?>
-			<option value="<?php echo $office['regional_office_id']; ?>"><?php echo $office['office_name']; ?></option>
-			<?php endwhile; ?>
-			</select></td>
-			<td><select name="district_name" id="district_name" onkeypress="submitOnEnter(this, event);"><option value='' selected="selected">Select Region First</option></select></td>
-			<td><select name="sublocation_parish" id="sublocation_parish" onkeypress="submitOnEnter(this, event);"></select></td>
-			<td><select name="village" id="village" onkeypress="submitOnEnter(this, event);"></select></td>
-			<td><input name="waterpoint_name" type="text" id="waterpoint_name" onkeypress="submitOnEnter(this, event);"/></td>
-			<td><input name="waterpoint_id" type="text" id="waterpoint_id" onkeypress="submitOnEnter(this, event);"/></td>
-			<td><input name="date_solved" type="text" id="date_solved" onkeypress="submitOnEnter(this, event);"/></td>
-			<td>
-			<select name="solvedby" id="solvedby" onkeypress="submitOnEnter(this, event);">
-			<option value=''></option>
-				<?php  
-				$result_set=mysql_query("SELECT * FROM  users WHERE regional_office_id='$session_regional_office_id' ORDER BY staff_name ASC");
-				while($row=mysql_fetch_array($result_set))
-				{
-				echo "<option value='{$row['emp_no']}'>{$row['staff_name']}</option>";
-				}
-				?>
-			</select>			</td>
-			<td>
-			<select name="issuetype_id" id="issuetype_id" onkeypress="submitOnEnter(this, event);">
-			<option value=''></option>
-				<?php  
-				$result_set=mysql_query("SELECT * FROM  issue_type ORDER BY issue_name ASC");
-				while($row=mysql_fetch_array($result_set))
-				{
-				echo "<option value='{$row['issuetype_id']}'>{$row['issue_name']}</option>";
-				}
-				?>
-			</select>			</td>
-			<td></td>
-			<td></td>
-			<td>E</td>
-			</tr>
-		<?php
-		// Get page data
-			$sel = "SELECT * FROM issue,waterpoints,program,regional_office,issue_type,users WHERE
-			issue.solved ='Yes' AND
-			issue.waterpoint_id=waterpoints.waterpoint_id AND 
-			issue.issuetype_id=issue_type.issuetype_id AND 
-			issue.solvedby=users.emp_no AND 
-			waterpoints.program_code=program.program_code AND
-			program.regional_office_id=regional_office.regional_office_id AND
-			program.regional_office_id LIKE'$f_regional_office_id' AND
-			waterpoints.district_name LIKE'%$f_district_name%' AND
-			waterpoints.sublocation_parish LIKE'%$f_sublocation_parish%' AND
-			waterpoints.village LIKE'%$f_village%' AND
-			waterpoints.waterpoint_id LIKE'%$f_waterpoint_id%' AND
-			waterpoints.waterpoint_name LIKE'%$f_waterpoint_name%' AND
-			issue.date_solved LIKE'%$f_date_solved%' AND
-			issue.solvedby LIKE'%$f_user_assigned%' AND
-			issue.issuetype_id LIKE'%$f_issuetype_id%'";
-			$result=mysql_query($sel);
-			$count=mysql_num_rows($result);
-			$indexcounter = 1;
-			while($rows=mysql_fetch_array($result))
-				{
-		?>
-			<tr >
-			<td><?php echo $indexcounter ?></td>
-			<td><?php echo $rows['office_name']; ?></td>
-			<td><?php echo $rows['district_name']; ?></td>
-			<td><?php echo $rows['sublocation_parish']; ?></td>
-			<td><?php echo $rows['village']; ?></td>
-			<td><?php echo $rows['waterpoint_name']; ?></td>
-			<td><?php echo $rows['waterpoint_id']; ?></td>
-			<td><?php echo $rows['date_solved']; ?></td>
-			<td><?php echo $rows['staff_name']; ?></td>
-			<td><?php echo $rows["issue_name"]; ?></td>
-			<td><?php echo $rows["dispenser_functional"]; ?></td>
-			<td><?php echo $rows["solved"]; ?></td>
-			<td><a href="edit_issue.php?issueid=<?php echo $rows["issueid"]; ?>&&redirect_link=solved_issues.php"><img src='images/edit.png' alt="Edit Issue" width="16" height="16" border="0" /></td>    
-		  </tr>
-		<?php 
-		$indexcounter++;
-		} ?>
-	    </table>
-		<p />
-      </div>
-	  </fieldset>
-	  </td>
-    </tr>
-  </table>
+    	<tr>
+            <td colspan="3">
+                <div id='top_menu'><?php require_once('includes/top_nav.php'); ?></div>
+            </td>
+        </tr>
+        
+        
+        <tr>
+        	<td colspan="3">
+            	<div id="left_menu">
+                      <?php 
+                        if ($session_level_id <= "2"){ 
+                            require_once('includes/left_column.php'); 
+                        }
+                      ?>
+                </div>
+                
+                <fieldset name="reg_user" id="reg_user"> 
+                    <legend align="center"><h2>ISSUES SOLVED</h2></legend>
+                    <div align="center"><?php include("includes/messageBox.php");?></div>
+                    <div style="height:540px; overflow:scroll">
+                    
+                    	<table class="gridtable" align="center" width="100%" id="tablesorter">
+                            <colgroup>
+                                <col id="No" />
+                                <col id="Regional Office" />
+                                <col id="District Name" />
+                                <col id="Sublocation/Parish" />
+                                <col id="Village Name" />
+                                <col id="Waterpoint Name" />
+                                <col id="Waterpoint ID" />
+                                <col id="Date Solved" />
+                                <col id="Solved By" />
+                                <col id="Issue Type" />
+                                <col id="D.F?" />
+                                <col id="Solved" />
+                            </colgroup>
+                        <thead id="statsHead">
+                            <tr>
+                                <th filter='false'>No</th>
+                                <th filter-type='ddl'>Regional Office</th>
+                                <th filter='false'>District Name</th>
+                                <th filter='false'>Sublocation/Parish</th>
+                                <th filter='false'>Village Name</th>
+                                <th filter='false'>Waterpoint Name</th>
+                                <th filter='false'>Waterpoint ID</th>
+                                <th filter='false'>Date Solved</th>
+                                <th filter='false'>Solved By</th>
+                                <th filter-type='ddl'>Issue Type</th>
+                                <th filter-type='ddl'>D.F?</th>
+                                <th filter='false'>Solved</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                                $sql = "SELECT * FROM issue,waterpoints,program,regional_office,issue_type,users 
+										WHERE issue.solved ='Yes' 
+										AND issue.waterpoint_id=waterpoints.waterpoint_id 
+										AND issue.issuetype_id=issue_type.issuetype_id 
+										AND issue.solvedby=users.emp_no 
+										AND waterpoints.program_code=program.program_code 
+										AND program.regional_office_id=regional_office.regional_office_id";
+                                $result = mysql_query($sql);
+                                $count = mysql_num_rows($result);
+                                $indexcounter = 1;
+                                while($rows = mysql_fetch_array($result)){
+                            ?>
+                                    <tr>
+                                        <td><?php echo $indexcounter ?></td>
+										<td><?php echo $rows['office_name']; ?></td>
+										<td><?php echo $rows['district_name']; ?></td>
+                                        <td><?php echo $rows['sublocation_parish']; ?></td>
+                                        <td><?php echo $rows['village']; ?></td>
+                                        <td><?php echo $rows['waterpoint_name']; ?></td>
+                                        <td><?php echo $rows['waterpoint_id']; ?></td>
+                                        <td><?php echo $rows['date_solved']; ?></td>
+                                        <td><?php echo $rows['staff_name']; ?></td>
+                                        <td><?php echo $rows["issue_name"]; ?></td>
+                                        <td><?php echo $rows["dispenser_functional"]; ?></td>
+                                        <td><?php echo $rows["solved"]; ?></td>
+										<td>
+                                        	<a href="view_issue.php?issueid=<?php echo $rows["issueid"]; ?>&&redirect_link=solved_issues.php">
+                                            	<img src='images/view_issue.jpg' alt="Edit Issue" width="16" height="16" border="0" />
+                                            </a>
+                                       	</td> 
+                                    </tr>
+                            <?php
+                                    $indexcounter++;
+                                }
+                            ?>
+                        </tbody>
+                    </table>
+                    </div>
+        		</fieldset>
+            </td>
+        <tr>
+        	<td colspan="3" class="footer"><?php require_once('includes/footer.php'); ?></td>
+   		</tr>
+    </table>
 </body>
 </html>

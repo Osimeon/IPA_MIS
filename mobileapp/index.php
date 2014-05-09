@@ -112,8 +112,9 @@
 				$status = $_POST['status'];
 				$user_assigned = $_POST['user_assigned'];
 				$resolved = $_POST['resolved'];
+				$prototype = $_POST['prototype'];
 				
-				$create = $db->addIssue($wpId, $typeId, $user, $comments, $status, $user_assigned, $resolved);
+				$create = $db->addIssue($wpId, $typeId, $user, $comments, $status, $user_assigned, $resolved, $prototype);
 				if($create != false){
 					echo($create);
 				}
@@ -131,8 +132,9 @@
 				$status = $_POST['status'];
 				$user_assigned = $_POST['user_assigned'];
 				$resolved = $_POST['resolved'];
+				$prototype = $_POST['prototype'];
 				
-				$create = $db->addIssueResolved($wpId, $typeId, $user, $comments, $status, $user_assigned, $resolved);
+				$create = $db->addIssueResolved($wpId, $typeId, $user, $comments, $status, $user_assigned, $resolved, $prototype);
 				if($create != false){
 					echo($create);
 				}

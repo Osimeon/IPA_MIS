@@ -22,34 +22,36 @@ class DB_Functions {
 	 * @param int $user id
 	 * @param String $comments
 	 */
-	function addIssue($wpId, $type, $user, $comments, $status){
+	function addIssue($wpId, $type, $user, $comments, $status, $prototype){
 		$date = date('Y-m-d');
 		//$status = "No";		
 		$response = array();
-		$sql = "INSERT INTO issue (waterpoint_id, date_created, dispenser_functional, issuetype_id,createdby,user_comments)".
-				"VALUES ('$wpId','$date','$status','$type','$user','$comments')";
+		$sql = "INSERT INTO issue (waterpoint_id, date_created, dispenser_functional, issuetype_id,createdby,user_comments, prototype)".
+				"VALUES ('$wpId','$date','$status','$type','$user','$comments','$prototype')";
 		if(mysql_query($sql) or die(mysql_error())){
 			$response["create"] = array();
 			$response["tag"] = 'createissue';
 			$response["success"] = 1;			
 			$response["error"] = 0;
+			$response["prototype"] = $prototype;
 			return json_encode($response);
 		}
 		else{
 			return FALSE;
 		}
 	}
-	function addIssueResolved($wpId, $type, $user, $comments, $status){
+	function addIssueResolved($wpId, $type, $user, $comments, $status, $prototype){
 		$date = date('Y-m-d');
 		$status = "Yes";		
 		$response = array();
-		$sql = "INSERT INTO issue (waterpoint_id, date_created, dispenser_functional, issuetype_id, createdby, user_comments, user_assigned, date_assigned, solved, solvedby, date_solved)".
-				"VALUES ('$wpId','$date','$status','$type','$user','$comments', '$user','$date','$status','$user','$date')";
+		$sql = "INSERT INTO issue (waterpoint_id, date_created, dispenser_functional, issuetype_id, createdby, user_comments, user_assigned, date_assigned, solved, solvedby, date_solved, prototype)".
+				"VALUES ('$wpId','$date','$status','$type','$user','$comments', '$user','$date','$status','$user','$date','$prototype')";
 		if(mysql_query($sql) or die(mysql_error())){
 			$response["create"] = array();
 			$response["tag"] = 'createissue';
 			$response["success"] = 1;			
 			$response["error"] = 0;
+			$response["prototype"] = $prototype;
 			return json_encode($response);
 		}
 		else{
